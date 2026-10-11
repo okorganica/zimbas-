@@ -292,6 +292,68 @@ th{background:#f8fafc}
   }
 
   init();
+  <div id="zimbasLogin" style="position:fixed;inset:0;z-index:999999;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif">
+  <form id="zimbasLoginForm" style="background:#fff;padding:30px;border-radius:14px;box-shadow:0 8px 30px #0002;width:340px;max-width:85%">
+    <h2 style="color:#12325b;margin-top:0">ZIMBAS INDUSTRIES</h2>
+    <p>Sign in to your ERP</p>
+    <input id="zimbasEmail" type="email" placeholder="Email address" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px">
+    <input id="zimbasPassword" type="password" placeholder="Password" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px">
+    <button id="zimbasSubmit" type="submit" style="width:100%;padding:12px;margin-top:10px;background:#12325b;color:white;border:0;border-radius:6px;cursor:pointer">Login</button>
+    <p id="zimbasMessage" style="font-size:13px;overflow-wrap:anywhere"></p>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function () {
+  const gate = document.getElementById('zimbasLogin');
+  const form = document.getElementById('zimbasLoginForm');
+  const msg = document.getElementById('zimbasMessage');
+  const btn = document.getElementById('zimbasSubmit');
+
+  if (!window.supabase) {
+    msg.textContent = 'Could not load Supabase. Check your internet connection.';
+    return;
+  }
+
+  const client = window.supabase.createClient(
+    'https://aweyeoayzjunlzjlbxra.supabase.co',
+    'sb_publishable_HWCnnlV1zV8nNQ_0bgukrg_tdBYMGK0'
+  );
+
+  const { data: sessionData, error: sessionError } =
+    await client.auth.getSession();
+
+  if (sessionError) msg.textContent = sessionError.message;
+
+  if (sessionData.session) {
+    gate.remove();
+  }
+
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    btn.disabled = true;
+    msg.textContent = 'Checking login...';
+
+    const { data, error } = await client.auth.signInWithPassword({
+      email: document.getElementById('zimbasEmail').value.trim(),
+      password: document.getElementById('zimbasPassword').value
+    });
+
+    btn.disabled = false;
+
+    if (error) {
+      msg.textContent = 'Login failed: ' + error.message;
+      return;
+    }
+
+    if (data.session) {
+      msg.textContent = 'Login successful!';
+      gate.remove();
+    }
+  });
+})();
+</script>
 })();
 </script>
 </body>
