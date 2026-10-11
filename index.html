@@ -1,64 +1,298 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zimbas Textile ERP</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6fa;color:#1c2940}
+button,input,select{font:inherit}
+button{cursor:pointer}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:white;padding:32px;border-radius:16px;width:100%;max-width:390px;box-shadow:0 8px 30px #17255418}
+.login-card h1{color:#12325b;font-size:25px}
+.field{width:100%;padding:12px;margin:8px 0;border:1px solid #cbd5e1;border-radius:7px}
+.primary{background:#12325b;color:white;border:0;border-radius:7px;padding:12px 16px}
+#loginButton{width:100%;margin-top:10px}
+#loginMessage{color:#b91c1c;font-size:13px;overflow-wrap:anywhere}
+#erp{display:none;min-height:100vh}
+.sidebar{width:225px;background:#12325b;color:white;padding:22px 12px;min-height:100vh;flex-shrink:0}
+.brand{font-size:20px;font-weight:bold;padding:8px 10px 25px}
+.nav{display:block;width:100%;text-align:left;background:transparent;color:#e2e8f0;border:0;padding:12px;border-radius:7px;margin:3px 0}
+.nav:hover,.nav.active{background:#24517f;color:white}
+.main{flex:1;min-width:0;padding:24px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h2{margin:0 0 8px}
+.muted{color:#64748b;font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin:24px 0}
+.card,.panel{background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px #0f172a08}
+.number{font-size:27px;font-weight:bold;margin-top:12px;color:#12325b}
+.panel{margin-top:16px;overflow:auto}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.toolbar input,.toolbar select{padding:10px;border:1px solid #cbd5e1;border-radius:7px;min-width:130px}
+table{width:100%;border-collapse:collapse;margin-top:12px;background:white}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #e2e8f0;font-size:13px}
+th{background:#f8fafc}
+.small-btn{border:0;border-radius:6px;padding:9px 12px;background:#e2e8f0;color:#12325b}
+.danger{background:#fee2e2;color:#991b1b}
+#content{margin-top:18px}
+@media(max-width:700px){#erp{display:none!important}.sidebar{width:100%;min-height:auto}.main{padding:15px}#erp{flex-direction:column}.sidebar{padding:12px}.brand{padding-bottom:10px}.nav{display:inline-block;width:auto}}
+</style>
+</head>
+<body>
 
-<div id="zimbasLogin" style="position:fixed;inset:0;z-index:999999;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif">
-  <form id="zimbasLoginForm" style="background:#fff;padding:30px;border-radius:14px;box-shadow:0 8px 30px #0002;width:340px;max-width:85%">
-    <h2 style="color:#12325b;margin-top:0">ZIMBAS INDUSTRIES</h2>
-    <p>Sign in to your ERP</p>
-    <input id="zimbasEmail" type="email" placeholder="Email address" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px">
-    <input id="zimbasPassword" type="password" placeholder="Password" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px">
-    <button id="zimbasSubmit" type="submit" style="width:100%;padding:12px;margin-top:10px;background:#12325b;color:white;border:0;border-radius:6px;cursor:pointer">Login</button>
-    <p id="zimbasMessage" style="font-size:13px;overflow-wrap:anywhere"></p>
+<section id="loginScreen">
+  <form class="login-card" id="loginForm">
+    <h1>ZIMBAS INDUSTRIES</h1>
+    <p class="muted">Textile ERP · Secure Login</p>
+    <label for="email">Email address</label>
+    <input class="field" id="email" type="email" autocomplete="username" required>
+    <label for="password">Password</label>
+    <input class="field" id="password" type="password" autocomplete="current-password" required>
+    <button class="primary" id="loginButton" type="submit">Sign in</button>
+    <p id="loginMessage" role="alert"></p>
   </form>
+</section>
+
+<div id="erp">
+  <aside class="sidebar">
+    <div class="brand">ZIMBAS ERP</div>
+    <button class="nav active" data-page="Dashboard">Dashboard</button>
+    <button class="nav" data-page="Customers">Customers</button>
+    <button class="nav" data-page="Inventory">Inventory / Store</button>
+    <button class="nav" data-page="Color Recipes">Color Recipes</button>
+    <button class="nav" data-page="Production">Production Batches</button>
+    <button class="nav" data-page="Quality Control">Quality Control</button>
+    <button class="nav" data-page="Reports">Reports</button>
+    <button class="nav" id="logoutButton">Sign out</button>
+  </aside>
+  <main class="main">
+    <div class="top">
+      <div>
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="muted">Textile manufacturing management</div>
+      </div>
+      <span class="muted" id="userEmail"></span>
+    </div>
+    <div id="content"></div>
+  </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-(async function () {
-  const gate = document.getElementById('zimbasLogin');
-  const form = document.getElementById('zimbasLoginForm');
-  const msg = document.getElementById('zimbasMessage');
-  const btn = document.getElementById('zimbasSubmit');
+(() => {
+  const SUPABASE_URL = 'https://aweyeoayzjunlzjlbxra.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_HWCnnlV1zV8nNQ_0bgukrg_tdBYMGK0';
 
-  if (!window.supabase) {
-    msg.textContent = 'Could not load Supabase. Check your internet connection.';
-    return;
+  const loginScreen = document.getElementById('loginScreen');
+  const erp = document.getElementById('erp');
+  const message = document.getElementById('loginMessage');
+  const loginButton = document.getElementById('loginButton');
+  const content = document.getElementById('content');
+
+  let client = null;
+  let currentPage = 'Dashboard';
+
+  const modules = {
+    'Customers': ['Customer Name','Contact','Email','Notes'],
+    'Inventory': ['Item Name','Category','Quantity','Unit'],
+    'Color Recipes': ['Recipe Name','Color Code','Ingredients','Notes'],
+    'Production': ['Batch Number','Product','Quantity','Status'],
+    'Quality Control': ['Batch Number','Inspection','Result','Remarks']
+  };
+
+  function loadRows(page) {
+    try {
+      return JSON.parse(localStorage.getItem('zimbas_' + page) || '[]');
+    } catch {
+      return [];
+    }
   }
 
-  const client = window.supabase.createClient(
-    'https://aweyeoayzjunlzjlbxra.supabase.co',
-    'sb_publishable_HWCnnlV1zV8nNQ_0bgukrg_tdBYMGK0'
-  );
-
-  const { data: sessionData, error: sessionError } =
-    await client.auth.getSession();
-
-  if (sessionError) msg.textContent = sessionError.message;
-
-  if (sessionData.session) {
-    gate.remove();
+  function saveRows(page, rows) {
+    localStorage.setItem('zimbas_' + page, JSON.stringify(rows));
   }
 
-  form.addEventListener('submit', async function (event) {
-    event.preventDefault();
-    btn.disabled = true;
-    msg.textContent = 'Checking login...';
+  function showApp(email) {
+    loginScreen.style.display = 'none';
+    erp.style.display = 'flex';
+    document.getElementById('userEmail').textContent = email || '';
+    renderPage(currentPage);
+  }
 
-    const { data, error } = await client.auth.signInWithPassword({
-      email: document.getElementById('zimbasEmail').value.trim(),
-      password: document.getElementById('zimbasPassword').value
+  function showLogin() {
+    erp.style.display = 'none';
+    loginScreen.style.display = 'flex';
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;',
+      '"':'&quot;', "'":'&#39;'
+    }[c]));
+  }
+
+  function dashboard() {
+    const names = Object.keys(modules);
+    const total = names.reduce((sum, name) => sum + loadRows(name).length, 0);
+    content.innerHTML = `
+      <div class="cards">
+        <div class="card">Customers<div class="number">${loadRows('Customers').length}</div></div>
+        <div class="card">Inventory Items<div class="number">${loadRows('Inventory').length}</div></div>
+        <div class="card">Production Batches<div class="number">${loadRows('Production').length}</div></div>
+        <div class="card">QC Records<div class="number">${loadRows('Quality Control').length}</div></div>
+      </div>
+      <div class="panel">
+        <h3>ERP Overview</h3>
+        <p>Total records stored in this browser: <b>${total}</b></p>
+        <p class="muted">Select a module from the left menu to add and manage records.</p>
+      </div>`;
+  }
+
+  function renderPage(page) {
+    currentPage = page;
+    document.getElementById('pageTitle').textContent = page;
+    document.querySelectorAll('.nav[data-page]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.page === page);
     });
 
-    btn.disabled = false;
-
-    if (error) {
-      msg.textContent = 'Login failed: ' + error.message;
+    if (page === 'Dashboard') {
+      dashboard();
       return;
     }
 
-    if (data.session) {
-      msg.textContent = 'Login successful!';
-      gate.remove();
+    if (page === 'Reports') {
+      const report = Object.keys(modules).map(name =>
+        `<tr><td>${escapeHTML(name)}</td><td>${loadRows(name).length}</td></tr>`
+      ).join('');
+      content.innerHTML = `
+        <div class="panel"><h3>ERP Reports</h3>
+        <table><thead><tr><th>Module</th><th>Records</th></tr></thead>
+        <tbody>${report}</tbody></table>
+        <div class="toolbar">
+          <button class="primary" id="exportReport">Export all data as JSON</button>
+        </div></div>`;
+      document.getElementById('exportReport').onclick = () => {
+        const data = {};
+        Object.keys(modules).forEach(name => data[name] = loadRows(name));
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'zimbas-erp-report.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+      return;
+    }
+
+    const fields = modules[page];
+    const rows = loadRows(page);
+    content.innerHTML = `
+      <div class="panel">
+        <h3>Add ${escapeHTML(page)} Record</h3>
+        <form id="recordForm">
+          <div class="toolbar">
+            ${fields.map((field,i) =>
+              `<input ${i===0?'required':''} name="f${i}" placeholder="${escapeHTML(field)}" aria-label="${escapeHTML(field)}">`
+            ).join('')}
+            <button class="primary" type="submit">Add Record</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h3>${escapeHTML(page)} Records (${rows.length})</h3>
+        <div style="overflow:auto">
+        <table>
+          <thead><tr>${fields.map(f=>`<th>${escapeHTML(f)}</th>`).join('')}<th>Action</th></tr></thead>
+          <tbody id="recordRows">
+          ${rows.map((row,index)=>`<tr>
+            ${fields.map((f,i)=>`<td>${escapeHTML(row[i])}</td>`).join('')}
+            <td><button class="small-btn danger" data-delete="${index}">Delete</button></td>
+          </tr>`).join('')}
+          </tbody>
+        </table>
+        </div>
+      </div>`;
+
+    document.getElementById('recordForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const values = fields.map((_,i) =>
+        event.target.elements['f'+i].value.trim()
+      );
+      if (!values[0]) return;
+      const updated = loadRows(page);
+      updated.push(values);
+      saveRows(page, updated);
+      renderPage(page);
+    });
+
+    content.querySelectorAll('[data-delete]').forEach(button => {
+      button.addEventListener('click', () => {
+        const updated = loadRows(page);
+        updated.splice(Number(button.dataset.delete), 1);
+        saveRows(page, updated);
+        renderPage(page);
+      });
+    });
+  }
+
+  document.querySelectorAll('.nav[data-page]').forEach(button => {
+    button.addEventListener('click', () => renderPage(button.dataset.page));
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    message.textContent = '';
+    loginButton.disabled = true;
+    loginButton.textContent = 'Signing in...';
+
+    try {
+      if (!client) {
+        if (!window.supabase) throw new Error('Supabase library did not load. Check internet and refresh.');
+        client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+
+      const {data, error} = await client.auth.signInWithPassword({
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value
+      });
+
+      if (error) throw error;
+      showApp(data.user?.email || '');
+    } catch (error) {
+      message.textContent = error.message || 'Login failed.';
+    } finally {
+      loginButton.disabled = false;
+      loginButton.textContent = 'Sign in';
     }
   });
+
+  document.getElementById('logoutButton').addEventListener('click', async () => {
+    if (client) await client.auth.signOut();
+    showLogin();
+  });
+
+  async function init() {
+    try {
+      client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const {data, error} = await client.auth.getSession();
+      if (error) throw error;
+      if (data.session) {
+        showApp(data.session.user.email);
+      } else {
+        showLogin();
+      }
+    } catch (error) {
+      showLogin();
+      message.textContent = 'Could not check session: ' + error.message;
+    }
+  }
+
+  init();
 })();
 </script>
+</body>
+</html>
