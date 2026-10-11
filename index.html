@@ -1,56 +1,64 @@
 
-<!-- ZIMBAS SUPABASE LOGIN -->
-<div id="authGate" style="position:fixed;inset:0;z-index:99999;background:#f3f6fa;display:flex;align-items:center;justify-content:center;font-family:Arial">
-  <form id="loginForm" style="background:white;padding:30px;border-radius:14px;width:320px;max-width:85%">
-    <h2>ZIMBAS INDUSTRIES</h2>
-    <p>Secure ERP Login</p>
-    <input id="email" type="email" placeholder="Email address" required style="width:100%;padding:12px;margin:8px 0;box-sizing:border-box">
-    <input id="password" type="password" placeholder="Password" required style="width:100%;padding:12px;margin:8px 0;box-sizing:border-box">
-    <button id="loginBtn" type="submit" style="width:100%;padding:12px;background:#10a7a0;color:white;border:0">Sign in</button>
-    <p id="loginMsg"></p>
+
+<div id="zimbasLogin" style="position:fixed;inset:0;z-index:999999;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif">
+  <form id="zimbasLoginForm" style="background:#fff;padding:30px;border-radius:14px;box-shadow:0 8px 30px #0002;width:340px;max-width:85%">
+    <h2 style="color:#12325b;margin-top:0">ZIMBAS INDUSTRIES</h2>
+    <p>Sign in to your ERP</p>
+    <input id="zimbasEmail" type="email" placeholder="Email address" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px">
+    <input id="zimbasPassword" type="password" placeholder="Password" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px">
+    <button id="zimbasSubmit" type="submit" style="width:100%;padding:12px;margin-top:10px;background:#12325b;color:white;border:0;border-radius:6px;cursor:pointer">Login</button>
+    <p id="zimbasMessage" style="font-size:13px;overflow-wrap:anywhere"></p>
   </form>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const sb = window.supabase.createClient(
-  'https://aweyeoayzjunlzjlbxra.supabase.co',
-  'sb_publishable_HWCnnlV1zV8nNQ_0bgukrg_tdBYMGK0'
-);
+(async function () {
+  const gate = document.getElementById('zimbasLogin');
+  const form = document.getElementById('zimbasLoginForm');
+  const msg = document.getElementById('zimbasMessage');
+  const btn = document.getElementById('zimbasSubmit');
 
-const gate = document.getElementById('authGate');
-const app = document.querySelector('.app');
-
-if (app) app.style.display = 'none';
-
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const msg = document.getElementById('loginMsg');
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  msg.textContent = 'Signing in...';
-
-  const { data, error } = await sb.auth.signInWithPassword({
-    email: document.getElementById('email').value.trim(),
-    password: document.getElementById('password').value
-  });
-
-  btn.disabled = false;
-
-  if (error) {
-    msg.textContent = error.message;
+  if (!window.supabase) {
+    msg.textContent = 'Could not load Supabase. Check your internet connection.';
     return;
   }
 
-  gate.style.display = 'none';
-  if (app) app.style.display = 'flex';
-});
+  const client = window.supabase.createClient(
+    'https://aweyeoayzjunlzjlbxra.supabase.co',
+    'sb_publishable_HWCnnlV1zV8nNQ_0bgukrg_tdBYMGK0'
+  );
 
-(async function() {
-  const { data } = await sb.auth.getSession();
-  if (data.session) {
-    gate.style.display = 'none';
-    if (app) app.style.display = 'flex';
+  const { data: sessionData, error: sessionError } =
+    await client.auth.getSession();
+
+  if (sessionError) msg.textContent = sessionError.message;
+
+  if (sessionData.session) {
+    gate.remove();
   }
+
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    btn.disabled = true;
+    msg.textContent = 'Checking login...';
+
+    const { data, error } = await client.auth.signInWithPassword({
+      email: document.getElementById('zimbasEmail').value.trim(),
+      password: document.getElementById('zimbasPassword').value
+    });
+
+    btn.disabled = false;
+
+    if (error) {
+      msg.textContent = 'Login failed: ' + error.message;
+      return;
+    }
+
+    if (data.session) {
+      msg.textContent = 'Login successful!';
+      gate.remove();
+    }
+  });
 })();
 </script>
-<!-- END ZIMBAS LOGIN -->
