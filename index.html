@@ -734,3 +734,30 @@ td .btn { padding: 6px 9px; font-size: 12px; }
 </script>
 </body>
 </html>
+
+<section id="gate-panel" style="display:none;padding:24px;font-family:Arial,sans-serif">
+  <h2>Gate In / Gate Out</h2>
+  <form id="gate-form">
+    <label>Movement</label>
+    <select id="gate-movement" required>
+      <option value="Gate In">Gate In</option>
+      <option value="Gate Out">Gate Out</option>
+    </select>
+    <br><br>
+    <label>Vehicle Number</label>
+    <input id="gate-vehicle" required placeholder="e.g. ABC-123" />
+    <br><br>
+    <label>Driver Name</label>
+    <input id="gate-driver" placeholder="Driver name" />
+    <br><br>
+    <label>Purpose</label>
+    <input id="gate-purpose" placeholder="Delivery, material, etc." />
+    <br><br>
+    <button type="submit">Save Gate Record</button>
+    <button type="button" id="gate-back">Back to Dashboard</button>
+  </form>
+  <p id="gate-message"></p>
+  <h3>Recent Gate Records</h3>
+  <div id="gate-records">Loading records...</div>
+</section>
+
