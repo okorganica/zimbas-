@@ -7,757 +7,283 @@
 <title>Zimbas Industries | Textile ERP</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --navy: #12325b;
-  --blue: #24517f;
-  --bg: #f3f6fa;
-  --text: #1c2940;
-  --muted: #64748b;
-  --border: #dbe3ed;
-  --red: #b91c1c;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
-.hidden { display: none !important; }
-#loginScreen {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: linear-gradient(135deg,#eaf1f9,#f8fafc);
-}
-.login-card {
-  width: 100%;
-  max-width: 420px;
-  background: white;
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0 12px 36px #0f172a18;
-}
-.logo {
-  font-weight: 800;
-  color: var(--navy);
-  font-size: 25px;
-}
-.sub {
-  color: var(--muted);
-  font-size: 13px;
-  margin: 8px 0 24px;
-}
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  margin: 12px 0 5px;
-}
-.field, input, select, textarea {
-  width: 100%;
-  padding: 11px 12px;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  background: white;
-  color: var(--text);
-}
-.btn {
-  border: 0;
-  border-radius: 7px;
-  padding: 10px 14px;
-  background: var(--navy);
-  color: white;
-  font-weight: 600;
-}
-.btn:hover { background: var(--blue); }
-.btn:disabled { opacity: .55; cursor: wait; }
-.btn.secondary { background: #e2e8f0; color: var(--navy); }
-.btn.danger { background: #fee2e2; color: #991b1b; }
-#loginButton {
-  width: 100%;
-  margin-top: 18px;
-  padding: 12px;
-}
-.message {
-  font-size: 13px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-  margin-top: 12px;
-}
-.error { color: var(--red); }
-.success-text { color: #166534; }
-.small-note {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-#erp { display: flex; min-height: 100vh; }
-.sidebar {
-  width: 245px;
-  background: var(--navy);
-  color: white;
-  padding: 18px 12px;
-  flex-shrink: 0;
-}
-.brand {
-  font-size: 20px;
-  font-weight: 800;
-  padding: 12px 10px 5px;
-}
-.brand-sub {
-  color: #cbd5e1;
-  font-size: 11px;
-  padding: 0 10px 20px;
-  letter-spacing: 1px;
-}
-.nav {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  color: #e2e8f0;
-  border: 0;
-  padding: 12px;
-  border-radius: 7px;
-  margin: 3px 0;
-}
-.nav:hover, .nav.active {
-  background: var(--blue);
-  color: white;
-}
-.nav .ico {
-  display: inline-block;
-  width: 25px;
-}
-.side-bottom {
-  margin-top: 22px;
-  border-top: 1px solid #ffffff2c;
-  padding-top: 14px;
-}
-.main { flex: 1; min-width: 0; padding: 24px; }
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 18px;
-}
-.top h1 { margin: 0; font-size: 25px; }
-.muted { color: var(--muted); font-size: 13px; }
-.user-area {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
-  gap: 14px;
-  margin: 22px 0;
-}
-.card, .panel {
-  background: white;
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 2px 8px #0f172a08;
-  border: 1px solid #edf1f6;
-}
-.card-label { color: var(--muted); font-size: 13px; }
-.number {
-  font-size: 29px;
-  font-weight: 800;
-  margin-top: 10px;
-  color: var(--navy);
-}
-.panel { margin-top: 16px; }
-.panel h3 { margin: 0 0 14px; }
-.toolbar {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 12px 0;
-}
-.toolbar input, .toolbar select { flex: 1; min-width: 140px; }
-.table-wrap { overflow: auto; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 12px;
-  background: white;
-  min-width: 500px;
-}
-th, td {
-  padding: 11px;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-  font-size: 13px;
-  vertical-align: top;
-}
-th { background: #f8fafc; color: #334155; }
-td .btn { padding: 6px 9px; font-size: 12px; }
-.empty { text-align: center; color: var(--muted); padding: 24px; }
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
-  gap: 10px;
-}
-.form-grid label { margin-top: 4px; }
-.status {
-  display: inline-block;
-  border-radius: 20px;
-  padding: 4px 9px;
-  font-size: 12px;
-  background: #e2e8f0;
-}
-.footer-note {
-  margin-top: 24px;
-  font-size: 12px;
-  color: var(--muted);
-}
-@media(max-width:760px) {
-  #erp { flex-direction: column; }
-  .sidebar { width: 100%; min-height: auto; padding: 10px; }
-  .brand { padding: 8px 8px 3px; }
-  .brand-sub { padding: 0 8px 10px; }
-  .nav { display: inline-block; width: auto; padding: 9px; }
-  .side-bottom { margin-top: 8px; padding-top: 8px; }
-  .main { padding: 15px; }
-  .top h1 { font-size: 21px; }
-  .login-card { padding: 24px; }
+:root{--navy:#12325b;--blue:#24517f;--bg:#f3f6fa;--text:#1c2940;--muted:#64748b;--border:#dbe3ed;--red:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#eaf1f9,#f8fafc)}
+.login-card{width:100%;max-width:420px;background:white;padding:32px;border-radius:16px;box-shadow:0 12px 36px #0f172a18}
+.logo{font-weight:800;color:var(--navy);font-size:25px}
+.sub{color:var(--muted);font-size:13px;margin:8px 0 24px}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 5px}
+.field,input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:7px;background:white;color:var(--text)}
+.btn{border:0;border-radius:7px;padding:10px 14px;background:var(--navy);color:white;font-weight:600}
+.btn:hover{background:var(--blue)}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn.secondary{background:#e2e8f0;color:var(--navy)}
+.btn.danger{background:#fee2e2;color:#991b1b}
+#loginButton{width:100%;margin-top:18px;padding:12px}
+.message{font-size:13px;line-height:1.5;overflow-wrap:anywhere;margin-top:12px}
+.error{color:var(--red)}
+.success-text{color:#166534}
+.small-note{font-size:12px;color:var(--muted);line-height:1.5}
+#erp{display:flex;min-height:100vh}
+.sidebar{width:245px;background:var(--navy);color:white;padding:18px 12px;flex-shrink:0}
+.brand{font-size:20px;font-weight:800;padding:12px 10px 5px}
+.brand-sub{color:#cbd5e1;font-size:11px;padding:0 10px 20px;letter-spacing:1px}
+.nav{display:block;width:100%;text-align:left;background:transparent;color:#e2e8f0;border:0;padding:12px;border-radius:7px;margin:3px 0}
+.nav:hover,.nav.active{background:var(--blue);color:white}
+.side-bottom{margin-top:22px;border-top:1px solid #ffffff2c;padding-top:14px}
+.main{flex:1;min-width:0;padding:24px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:18px}
+.top h1{margin:0;font-size:25px}
+.muted{color:var(--muted);font-size:13px}
+.user-area{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:22px 0}
+.card,.panel{background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px #0f172a08;border:1px solid #edf1f6}
+.card-label{color:var(--muted);font-size:13px}
+.number{font-size:29px;font-weight:800;margin-top:10px;color:var(--navy)}
+.panel{margin-top:16px}
+.panel h3{margin:0 0 14px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.toolbar input,.toolbar select{flex:1;min-width:140px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;margin-top:12px;background:white;min-width:500px}
+th,td{padding:11px;text-align:left;border-bottom:1px solid #e2e8f0;font-size:13px;vertical-align:top}
+th{background:#f8fafc;color:#334155}
+td .btn{padding:6px 9px;font-size:12px}
+.empty{text-align:center;color:var(--muted);padding:24px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.form-grid label{margin-top:4px}
+.status{display:inline-block;border-radius:20px;padding:4px 9px;font-size:12px;background:#e2e8f0}
+.footer-note{margin-top:24px;font-size:12px;color:var(--muted)}
+@media(max-width:760px){
+#erp{flex-direction:column}
+.sidebar{width:100%;min-height:auto;padding:10px}
+.brand{padding:8px 8px 3px}
+.brand-sub{padding:0 8px 10px}
+.nav{display:inline-block;width:auto;padding:9px}
+.side-bottom{margin-top:8px;padding-top:8px}
+.main{padding:15px}
+.top h1{font-size:21px}
+.login-card{padding:24px}
 }
 </style>
 </head>
 <body>
 
 <section id="loginScreen">
-  <form class="login-card" id="loginForm">
-    <div class="logo">ZIMBAS INDUSTRIES</div>
-    <div class="sub">TEXTILE ERP · SECURE SIGN IN</div>
-
-    <label for="email">Email address</label>
-    <input class="field" id="email" type="email"
-      autocomplete="username" placeholder="you@company.com" required>
-
-    <label for="password">Password</label>
-    <input class="field" id="password" type="password"
-      autocomplete="current-password" placeholder="Your password" required>
-
-    <button class="btn" id="loginButton" type="submit">Sign in</button>
-    <p class="small-note">
-      Use an existing user created in Supabase Authentication → Users.
-    </p>
-    <p id="loginMessage" class="message" role="alert"></p>
-  </form>
+<form class="login-card" id="loginForm">
+<div class="logo">ZIMBAS INDUSTRIES</div>
+<div class="sub">TEXTILE ERP · SECURE SIGN IN</div>
+<label for="email">Email address</label>
+<input class="field" id="email" type="email" autocomplete="username" placeholder="you@company.com" required>
+<label for="password">Password</label>
+<input class="field" id="password" type="password" autocomplete="current-password" placeholder="Your password" required>
+<button class="btn" id="loginButton" type="submit">Sign in</button>
+<p class="small-note">Use an existing user created in Supabase Authentication → Users.</p>
+<p id="loginMessage" class="message" role="alert"></p>
+</form>
 </section>
 
 <div id="erp" class="hidden">
-  <aside class="sidebar">
-    <div class="brand">ZIMBAS ERP</div>
-    <div class="brand-sub">TEXTILE OPERATIONS</div>
-
-    <button class="nav active" data-page="Dashboard">▦ Dashboard</button>
-    <button class="nav" data-page="Customers">♙ Customers</button>
-    <button class="nav" data-page="Inventory">▤ Inventory / Store</button>
-    <button class="nav" data-page="Color Recipes">◉ Color Recipes</button>
-    <button class="nav" data-page="Production">⚙ Production Batches</button>
-    <button class="nav" data-page="Quality Control">✓ Quality Control</button>
-    <button class="nav" data-page="Employees">♧ Employees</button>
-    <button class="nav" data-page="Tasks">☷ Department Tasks</button>
-    <button class="nav" data-page="Reports">▥ Reports & Export</button>
-    <button class="nav" data-page="Settings">⚙ Settings</button>
-
-    <div class="side-bottom">
-      <button class="nav" id="logoutButton">↪ Sign out</button>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="top">
-      <div>
-        <h1 id="pageTitle">Dashboard</h1>
-        <div class="muted">Textile manufacturing management</div>
-      </div>
-      <div class="user-area">
-        <span class="muted" id="userEmail"></span>
-        <span class="status" id="connectionStatus">Checking session</span>
-      </div>
-    </header>
-
-    <div id="content"></div>
-    <div class="footer-note">
-      Zimbas ERP · Records in this version are saved in this browser.
-      Cloud database synchronization is not enabled yet.
-    </div>
-  </main>
+<aside class="sidebar">
+<div class="brand">ZIMBAS ERP</div>
+<div class="brand-sub">TEXTILE OPERATIONS</div>
+<button class="nav active" data-page="Dashboard">▦ Dashboard</button>
+<button class="nav" data-page="Customers">♙ Customers</button>
+<button class="nav" data-page="Inventory">▤ Inventory / Store</button>
+<button class="nav" data-page="Color Recipes">◉ Color Recipes</button>
+<button class="nav" data-page="Production">⚙ Production Batches</button>
+<button class="nav" data-page="Quality Control">✓ Quality Control</button>
+<button class="nav" data-page="Employees">♧ Employees</button>
+<button class="nav" data-page="Tasks">☷ Department Tasks</button>
+<button class="nav" data-page="Gate Register">↔ Gate In / Gate Out</button>
+<button class="nav" data-page="Reports">▥ Reports & Export</button>
+<button class="nav" data-page="Settings">⚙ Settings</button>
+<div class="side-bottom"><button class="nav" id="logoutButton">↪ Sign out</button></div>
+</aside>
+<main class="main">
+<header class="top">
+<div><h1 id="pageTitle">Dashboard</h1><div class="muted">Textile manufacturing management</div></div>
+<div class="user-area"><span class="muted" id="userEmail"></span><span class="status" id="connectionStatus">Checking session</span></div>
+</header>
+<div id="content"></div>
+<div class="footer-note">Zimbas ERP · Records in this version are saved in this browser. Cloud database synchronization is not enabled yet.</div>
+</main>
 </div>
 
 <script>
 (() => {
-  'use strict';
+'use strict';
 
-  const SUPABASE_URL = 'https://aweyeoayzjunlzjlbxra.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_HWCnnlV1zV8nNQ_0bgukrg_tdBYMGK0';
+const SUPABASE_URL='https://aweyeoayzjunlzjlbxra.supabase.co';
+const SUPABASE_KEY='sb_publishable_HWCnnlV1zV8nNQ_0bgukrg_tdBYMGK0';
+const $=id=>document.getElementById(id);
+const loginScreen=$('loginScreen'),erp=$('erp'),message=$('loginMessage'),loginButton=$('loginButton'),content=$('content');
+let client=null,currentPage='Dashboard',currentUser=null;
 
-  const $ = id => document.getElementById(id);
-  const loginScreen = $('loginScreen');
-  const erp = $('erp');
-  const message = $('loginMessage');
-  const loginButton = $('loginButton');
-  const content = $('content');
+const modules={
+'Customers':['Customer Name','Contact Number','Email','Address / Notes'],
+'Inventory':['Item Name','Category','Quantity','Unit','Reorder Level'],
+'Color Recipes':['Recipe Name','Color Code','Ingredients','Recipe Notes'],
+'Production':['Batch Number','Product / Fabric','Quantity','Status','Start Date'],
+'Quality Control':['Batch Number','Inspection Type','Result','Inspector / Remarks'],
+'Employees':['Employee Name','Department','Contact','Job Title'],
+'Tasks':['Task Title','Department','Assigned To','Due Date','Status'],
+'Gate Register':['Movement','Vehicle Number','Driver Name','Purpose','Date & Time']
+};
 
-  let client = null;
-  let currentPage = 'Dashboard';
-  let currentUser = null;
+const departments=['Production','Quality Control','Inventory','Accounts','Color Recipe Management'];
+function keyFor(page){return 'zimbas_v2_'+page}
+function loadRows(page){try{return JSON.parse(localStorage.getItem(keyFor(page))||'[]')}catch(e){return []}}
+function saveRows(page,rows){localStorage.setItem(keyFor(page),JSON.stringify(rows))}
+function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function setMessage(text,type='error'){message.textContent=text;message.className='message '+(type==='success'?'success-text':'error')}
+function showLogin(){erp.classList.add('hidden');loginScreen.classList.remove('hidden');$('connectionStatus').textContent='Signed out'}
+function showApp(user){currentUser=user;loginScreen.classList.add('hidden');erp.classList.remove('hidden');$('userEmail').textContent=user?.email||'';$('connectionStatus').textContent='Authenticated';renderPage(currentPage)}
+function count(page){return loadRows(page).length}
 
-  const modules = {
-    'Customers': ['Customer Name','Contact Number','Email','Address / Notes'],
-    'Inventory': ['Item Name','Category','Quantity','Unit','Reorder Level'],
-    'Color Recipes': ['Recipe Name','Color Code','Ingredients','Recipe Notes'],
-    'Production': ['Batch Number','Product / Fabric','Quantity','Status','Start Date'],
-    'Quality Control': ['Batch Number','Inspection Type','Result','Inspector / Remarks'],
-    'Employees': ['Employee Name','Department','Contact','Job Title'],
-    'Tasks': ['Task Title','Department','Assigned To','Due Date','Status']
-  };
+function dashboard(){
+const metrics=[
+['Customers',count('Customers')],
+['Inventory Items',count('Inventory')],
+['Color Recipes',count('Color Recipes')],
+['Production Batches',count('Production')],
+['QC Records',count('Quality Control')],
+['Open Tasks',loadRows('Tasks').filter(r=>String(r[4]||'Open').toLowerCase()!=='completed').length],
+['Gate Records',count('Gate Register')]
+];
+content.innerHTML=`
+<div class="cards">${metrics.map(m=>`<div class="card"><div class="card-label">${escapeHTML(m[0])}</div><div class="number">${m[1]}</div></div>`).join('')}</div>
+<div class="panel"><h3>Welcome to Zimbas ERP</h3><p>Manage customers, inventory, color recipes, production batches, quality inspections, employees, department tasks and Gate In/Gate Out.</p><p class="small-note">Open a module, complete its fields and click Add Record. Use Reports & Export to download a backup.</p></div>
+<div class="panel"><h3>Department overview</h3><div class="toolbar">${departments.map(d=>`<span class="status">${escapeHTML(d)}</span>`).join('')}</div></div>`;
+}
 
-  const departments = [
-    'Production',
-    'Quality Control',
-    'Inventory',
-    'Accounts',
-    'Color Recipe Management'
-  ];
+function renderModule(page){
+const fields=modules[page];
+const rows=loadRows(page);
+content.innerHTML=`
+<div class="panel">
+<h3>Add ${escapeHTML(page)} Record</h3>
+<form id="recordForm">
+<div class="form-grid">
+${fields.map((f,i)=>`<div><label for="field${i}">${escapeHTML(f)}${i===0?' *':''}</label>
+${f==='Movement'?`<select id="field${i}" name="f${i}" required><option value="Gate In">Gate In</option><option value="Gate Out">Gate Out</option></select>`:
+f==='Status'||f==='Result'?`<select id="field${i}" name="f${i}"><option value="">Select...</option>${(f==='Status'?['Open','In Progress','Completed','On Hold']:['Pass','Fail','Pending']).map(v=>`<option>${v}</option>`).join('')}</select>`:
+`<input id="field${i}" name="f${i}" ${i===0?'required':''} placeholder="${escapeHTML(f)}" ${f==='Due Date'||f==='Start Date'?'type="date"':''} ${f==='Date & Time'?'type="datetime-local"':''}>`}</div>`).join('')}
+</div>
+<div class="toolbar"><button class="btn" type="submit">＋ Add Record</button><button class="btn secondary" type="reset">Clear Fields</button></div>
+</form>
+</div>
+<div class="panel"><h3>${escapeHTML(page)} Records <span class="status">${rows.length}</span></h3><div class="table-wrap"><table><thead><tr>${fields.map(f=>`<th>${escapeHTML(f)}</th>`).join('')}<th>Action</th></tr></thead><tbody>
+${rows.length?rows.map((row,index)=>`<tr>${fields.map((f,i)=>`<td>${escapeHTML(row[i])}</td>`).join('')}<td><button class="btn danger" data-delete="${index}">Delete</button></td></tr>`).join(''):`<tr><td colspan="${fields.length+1}" class="empty">No records yet. Add your first record above.</td></tr>`}
+</tbody></table></div></div>`;
 
-  function keyFor(page) {
-    return 'zimbas_v2_' + page;
-  }
+if(page==='Gate Register'){
+const dateField=$('field4');
+if(dateField&&!dateField.value){const now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());dateField.value=now.toISOString().slice(0,16)}
+}
+$('recordForm').addEventListener('submit',e=>{
+e.preventDefault();
+const values=fields.map((_,i)=>e.target.elements['f'+i].value.trim());
+if(!values[0])return;
+const data=loadRows(page);data.push(values);saveRows(page,data);renderPage(page);
+});
+content.querySelectorAll('[data-delete]').forEach(btn=>btn.addEventListener('click',()=>{
+if(!confirm('Delete this record?'))return;
+const data=loadRows(page);data.splice(Number(btn.dataset.delete),1);saveRows(page,data);renderPage(page);
+}));
+}
 
-  function loadRows(page) {
-    try {
-      return JSON.parse(localStorage.getItem(keyFor(page)) || '[]');
-    } catch (e) {
-      return [];
-    }
-  }
+function csvCell(value){return '"'+String(value??'').replace(/"/g,'""')+'"'}
+function download(name,text,type){
+const blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');
+a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 
-  function saveRows(page, rows) {
-    localStorage.setItem(keyFor(page), JSON.stringify(rows));
-  }
+function reports(){
+const names=Object.keys(modules),total=names.reduce((sum,n)=>sum+count(n),0);
+content.innerHTML=`
+<div class="cards"><div class="card"><div class="card-label">Total records</div><div class="number">${total}</div></div><div class="card"><div class="card-label">Active modules</div><div class="number">${names.length}</div></div></div>
+<div class="panel"><h3>Data summary</h3><div class="table-wrap"><table><thead><tr><th>Module</th><th>Records</th></tr></thead><tbody>${names.map(n=>`<tr><td>${escapeHTML(n)}</td><td>${count(n)}</td></tr>`).join('')}</tbody></table></div>
+<div class="toolbar"><button class="btn" id="exportJson">Export all data (JSON)</button><button class="btn secondary" id="exportCsv">Export combined data (CSV)</button><button class="btn secondary" id="importButton">Import JSON backup</button><input type="file" id="importFile" accept=".json,application/json" class="hidden"></div>
+<p class="small-note">Importing replaces records in matching modules.</p></div>`;
+$('exportJson').onclick=()=>download('zimbas-erp-backup.json',JSON.stringify(Object.fromEntries(names.map(n=>[n,loadRows(n)])),null,2),'application/json');
+$('exportCsv').onclick=()=>{
+const lines=['Module,Fields,Values'];
+names.forEach(n=>loadRows(n).forEach(row=>lines.push([n,modules[n].join(' | '),row.join(' | ')].map(csvCell).join(','))));
+download('zimbas-erp-export.csv',lines.join('\r\n'),'text/csv');
+};
+$('importButton').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{
+const file=e.target.files[0];if(!file)return;
+try{
+const data=JSON.parse(await file.text());
+if(!confirm('Import backup and replace matching module records?'))return;
+names.forEach(n=>{if(Array.isArray(data[n]))saveRows(n,data[n])});
+alert('Backup imported.');renderPage('Reports');
+}catch(err){alert('Could not import this JSON file.')}
+};
+}
 
-  function escapeHTML(value) {
-    return String(value ?? '').replace(/[&<>"']/g, c => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    }[c]));
-  }
+function settings(){
+content.innerHTML=`
+<div class="panel"><h3>Settings & Data</h3>
+<p><b>Signed in user:</b> ${escapeHTML(currentUser?.email||'')}</p>
+<p><b>Authentication:</b> Supabase email/password</p>
+<p><b>Storage:</b> This browser's local storage</p>
+<p class="small-note">This version uses Supabase for login only. Records are saved in this browser, not shared between computers. Cloud database synchronization is not enabled.</p>
+<div class="toolbar"><button class="btn secondary" id="downloadBackup">Download backup</button><button class="btn danger" id="clearData">Clear local ERP records</button></div></div>`;
+$('downloadBackup').onclick=()=>download('zimbas-erp-backup.json',JSON.stringify(Object.fromEntries(Object.keys(modules).map(n=>[n,loadRows(n)])),null,2),'application/json');
+$('clearData').onclick=()=>{
+if(!confirm('Permanently delete ERP records saved in this browser?'))return;
+Object.keys(modules).forEach(n=>localStorage.removeItem(keyFor(n)));
+renderPage('Settings');
+};
+}
 
-  function setMessage(text, type = 'error') {
-    message.textContent = text;
-    message.className = 'message ' +
-      (type === 'success' ? 'success-text' : 'error');
-  }
+function renderPage(page){
+currentPage=page;$('pageTitle').textContent=page;
+document.querySelectorAll('.nav[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+if(page==='Dashboard')dashboard();
+else if(page==='Reports')reports();
+else if(page==='Settings')settings();
+else renderModule(page);
+}
+document.querySelectorAll('.nav[data-page]').forEach(b=>b.addEventListener('click',()=>renderPage(b.dataset.page)));
 
-  function showLogin() {
-    erp.classList.add('hidden');
-    loginScreen.classList.remove('hidden');
-    $('connectionStatus').textContent = 'Signed out';
-  }
+$('loginForm').addEventListener('submit',async e=>{
+e.preventDefault();setMessage('');loginButton.disabled=true;loginButton.textContent='Signing in...';
+try{
+if(!window.supabase)throw new Error('Supabase library did not load. Check internet and refresh.');
+if(!client)client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const {data,error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+if(error)throw error;
+if(!data.user)throw new Error('Login did not return a user.');
+setMessage('Login successful. Opening ERP...','success');showApp(data.user);
+}catch(err){setMessage(err?.message||'Login failed. Check email and password.')}
+finally{loginButton.disabled=false;loginButton.textContent='Sign in'}
+});
 
-  function showApp(user) {
-    currentUser = user;
-    loginScreen.classList.add('hidden');
-    erp.classList.remove('hidden');
-    $('userEmail').textContent = user?.email || '';
-    $('connectionStatus').textContent = 'Authenticated';
-    renderPage(currentPage);
-  }
+$('logoutButton').addEventListener('click',async()=>{
+try{if(client)await client.auth.signOut()}catch(e){}
+currentUser=null;showLogin();
+});
 
-  function count(page) {
-    return loadRows(page).length;
-  }
-
-  function dashboard() {
-    const metrics = [
-      ['Customers', count('Customers')],
-      ['Inventory Items', count('Inventory')],
-      ['Color Recipes', count('Color Recipes')],
-      ['Production Batches', count('Production')],
-      ['QC Records', count('Quality Control')],
-      ['Open Tasks', loadRows('Tasks').filter(
-        r => String(r[4] || 'Open').toLowerCase() !== 'completed'
-      ).length]
-    ];
-
-    content.innerHTML = `
-      <div class="cards">
-        ${metrics.map(m => `
-          <div class="card">
-            <div class="card-label">${escapeHTML(m[0])}</div>
-            <div class="number">${m[1]}</div>
-          </div>
-        `).join('')}
-      </div>
-
-      <div class="panel">
-        <h3>Welcome to Zimbas ERP</h3>
-        <p>Manage customers, inventory, color recipes, production batches,
-        quality inspections, employees and department tasks.</p>
-        <p class="small-note">Open a module, complete its fields and click
-        Add Record. Use Reports & Export to download a backup.</p>
-      </div>
-
-      <div class="panel">
-        <h3>Department overview</h3>
-        <div class="toolbar">
-          ${departments.map(d => `
-            <span class="status">${escapeHTML(d)}</span>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  function renderModule(page) {
-    const fields = modules[page];
-    const rows = loadRows(page);
-
-    content.innerHTML = `
-      <div class="panel">
-        <h3>Add ${escapeHTML(page)} Record</h3>
-        <form id="recordForm">
-          <div class="form-grid">
-            ${fields.map((f, i) => `
-              <div>
-                <label for="field${i}">
-                  ${escapeHTML(f)}${i === 0 ? ' *' : ''}
-                </label>
-                ${
-                  f === 'Status' || f === 'Result'
-                  ? `<select id="field${i}" name="f${i}">
-                      <option value="">Select...</option>
-                      ${(f === 'Status'
-                        ? ['Open','In Progress','Completed','On Hold']
-                        : ['Pass','Fail','Pending']
-                      ).map(v => `<option>${v}</option>`).join('')}
-                    </select>`
-                  : `<input id="field${i}" name="f${i}"
-                      ${i === 0 ? 'required' : ''}
-                      placeholder="${escapeHTML(f)}"
-                      ${f === 'Due Date' || f === 'Start Date'
-                        ? 'type="date"' : ''}>`
-                }
-              </div>
-            `).join('')}
-          </div>
-
-          <div class="toolbar">
-            <button class="btn" type="submit">＋ Add Record</button>
-            <button class="btn secondary" type="reset">Clear Fields</button>
-          </div>
-        </form>
-      </div>
-
-      <div class="panel">
-        <h3>${escapeHTML(page)} Records
-          <span class="status">${rows.length}</span>
-        </h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                ${fields.map(f => `<th>${escapeHTML(f)}</th>`).join('')}
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.length ? rows.map((row, index) => `
-                <tr>
-                  ${fields.map((f, i) => `
-                    <td>${escapeHTML(row[i])}</td>
-                  `).join('')}
-                  <td>
-                    <button class="btn danger" data-delete="${index}">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              `).join('') : `
-                <tr>
-                  <td colspan="${fields.length + 1}" class="empty">
-                    No records yet. Add your first record above.
-                  </td>
-                </tr>
-              `}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-
-    $('recordForm').addEventListener('submit', e => {
-      e.preventDefault();
-      const values = fields.map((_, i) =>
-        e.target.elements['f' + i].value.trim()
-      );
-      if (!values[0]) return;
-
-      const data = loadRows(page);
-      data.push(values);
-      saveRows(page, data);
-      renderPage(page);
-    });
-
-    content.querySelectorAll('[data-delete]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (!confirm('Delete this record?')) return;
-        const data = loadRows(page);
-        data.splice(Number(btn.dataset.delete), 1);
-        saveRows(page, data);
-        renderPage(page);
-      });
-    });
-  }
-
-  function csvCell(value) {
-    return '"' + String(value ?? '').replace(/"/g, '""') + '"';
-  }
-
-  function download(name, text, type) {
-    const blob = new Blob([text], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
-  function reports() {
-    const names = Object.keys(modules);
-    const total = names.reduce((sum, n) => sum + count(n), 0);
-
-    content.innerHTML = `
-      <div class="cards">
-        <div class="card">
-          <div class="card-label">Total records</div>
-          <div class="number">${total}</div>
-        </div>
-        <div class="card">
-          <div class="card-label">Active modules</div>
-          <div class="number">${names.length}</div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Data summary</h3>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Module</th><th>Records</th></tr></thead>
-            <tbody>
-              ${names.map(n => `
-                <tr><td>${escapeHTML(n)}</td><td>${count(n)}</td></tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="toolbar">
-          <button class="btn" id="exportJson">Export all data (JSON)</button>
-          <button class="btn secondary" id="exportCsv">Export combined data (CSV)</button>
-          <button class="btn secondary" id="importButton">Import JSON backup</button>
-          <input type="file" id="importFile" accept=".json,application/json" class="hidden">
-        </div>
-        <p class="small-note">Importing replaces records in matching modules.</p>
-      </div>
-    `;
-
-    $('exportJson').onclick = () => download(
-      'zimbas-erp-backup.json',
-      JSON.stringify(Object.fromEntries(names.map(n => [n, loadRows(n)])), null, 2),
-      'application/json'
-    );
-
-    $('exportCsv').onclick = () => {
-      const lines = ['Module,Fields,Values'];
-      names.forEach(n => {
-        loadRows(n).forEach(row => {
-          lines.push(
-            [n, modules[n].join(' | '), row.join(' | ')]
-              .map(csvCell).join(',')
-          );
-        });
-      });
-      download('zimbas-erp-export.csv', lines.join('\r\n'), 'text/csv');
-    };
-
-    $('importButton').onclick = () => $('importFile').click();
-
-    $('importFile').onchange = async e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      try {
-        const data = JSON.parse(await file.text());
-        if (!confirm('Import backup and replace matching module records?')) return;
-        names.forEach(n => {
-          if (Array.isArray(data[n])) saveRows(n, data[n]);
-        });
-        alert('Backup imported.');
-        renderPage('Reports');
-      } catch (err) {
-        alert('Could not import this JSON file.');
-      }
-    };
-  }
-
-  function settings() {
-    content.innerHTML = `
-      <div class="panel">
-        <h3>Settings & Data</h3>
-        <p><b>Signed in user:</b> ${escapeHTML(currentUser?.email || '')}</p>
-        <p><b>Authentication:</b> Supabase email/password</p>
-        <p><b>Storage:</b> This browser's local storage</p>
-        <p class="small-note">This version uses Supabase for login only.
-        Records are saved in this browser, not shared between computers.
-        Database tables and security policies must be connected to enable
-        cloud storage.</p>
-        <div class="toolbar">
-          <button class="btn secondary" id="downloadBackup">Download backup</button>
-          <button class="btn danger" id="clearData">Clear local ERP records</button>
-        </div>
-      </div>
-    `;
-
-    $('downloadBackup').onclick = () => download(
-      'zimbas-erp-backup.json',
-      JSON.stringify(Object.fromEntries(
-        Object.keys(modules).map(n => [n, loadRows(n)])
-      ), null, 2),
-      'application/json'
-    );
-
-    $('clearData').onclick = () => {
-      if (!confirm('Permanently delete ERP records saved in this browser?')) return;
-      Object.keys(modules).forEach(n => localStorage.removeItem(keyFor(n)));
-      renderPage('Settings');
-    };
-  }
-
-  function renderPage(page) {
-    currentPage = page;
-    $('pageTitle').textContent = page;
-
-    document.querySelectorAll('.nav[data-page]').forEach(b =>
-      b.classList.toggle('active', b.dataset.page === page)
-    );
-
-    if (page === 'Dashboard') dashboard();
-    else if (page === 'Reports') reports();
-    else if (page === 'Settings') settings();
-    else renderModule(page);
-  }
-
-  document.querySelectorAll('.nav[data-page]').forEach(b =>
-    b.addEventListener('click', () => renderPage(b.dataset.page))
-  );
-
-  $('loginForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    setMessage('');
-    loginButton.disabled = true;
-    loginButton.textContent = 'Signing in...';
-
-    try {
-      if (!window.supabase) {
-        throw new Error('Supabase library did not load. Check internet and refresh.');
-      }
-
-      if (!client) {
-        client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      }
-
-      const { data, error } = await client.auth.signInWithPassword({
-        email: $('email').value.trim(),
-        password: $('password').value
-      });
-
-      if (error) throw error;
-      if (!data.user) throw new Error('Login did not return a user.');
-
-      setMessage('Login successful. Opening ERP...', 'success');
-      showApp(data.user);
-    } catch (err) {
-      setMessage(err?.message || 'Login failed. Check email and password.');
-    } finally {
-      loginButton.disabled = false;
-      loginButton.textContent = 'Sign in';
-    }
-  });
-
-  $('logoutButton').addEventListener('click', async () => {
-    try {
-      if (client) await client.auth.signOut();
-    } catch (e) {}
-    currentUser = null;
-    showLogin();
-  });
-
-  async function init() {
-    try {
-      if (!window.supabase) {
-        throw new Error('Supabase library failed to load. Check internet connection.');
-      }
-
-      client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data, error } = await client.auth.getSession();
-      if (error) throw error;
-
-      if (data.session) showApp(data.session.user);
-      else showLogin();
-    } catch (err) {
-      showLogin();
-      setMessage('Could not check session: ' + (err.message || 'Unknown error'));
-    }
-  }
-
-  init();
+async function init(){
+try{
+if(!window.supabase)throw new Error('Supabase library failed to load. Check internet connection.');
+client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const {data,error}=await client.auth.getSession();
+if(error)throw error;
+if(data.session)showApp(data.session.user);else showLogin();
+}catch(err){showLogin();setMessage('Could not check session: '+(err.message||'Unknown error'))}
+}
+init();
 })();
 </script>
 </body>
 </html>
-
-<section id="gate-panel" style="display:none;padding:24px;font-family:Arial,sans-serif">
-  <h2>Gate In / Gate Out</h2>
-  <form id="gate-form">
-    <label>Movement</label>
-    <select id="gate-movement" required>
-      <option value="Gate In">Gate In</option>
-      <option value="Gate Out">Gate Out</option>
-    </select>
-    <br><br>
-    <label>Vehicle Number</label>
-    <input id="gate-vehicle" required placeholder="e.g. ABC-123" />
-    <br><br>
-    <label>Driver Name</label>
-    <input id="gate-driver" placeholder="Driver name" />
-    <br><br>
-    <label>Purpose</label>
-    <input id="gate-purpose" placeholder="Delivery, material, etc." />
-    <br><br>
-    <button type="submit">Save Gate Record</button>
-    <button type="button" id="gate-back">Back to Dashboard</button>
-  </form>
-  <p id="gate-message"></p>
-  <h3>Recent Gate Records</h3>
-  <div id="gate-records">Loading records...</div>
-</section>
-
