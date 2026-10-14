@@ -251,7 +251,8 @@ document.querySelectorAll('.nav[data-page]').forEach(b=>b.classList.toggle('acti
 if(page==='Dashboard')dashboard();
 else if(page==='Reports')reports();
 else if(page==='Settings')settings();
-else renderModule(page);
+else if (modules[page]) renderModule(page);
+else content.innerHTML = '<div class="panel">Module not found. Please refresh the page.</div>';
 }
 document.querySelectorAll('.nav[data-page]').forEach(b=>b.addEventListener('click',()=>renderPage(b.dataset.page)));
 
